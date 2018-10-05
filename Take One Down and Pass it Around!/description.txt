@@ -1,0 +1,41 @@
+You see a wall, and there's 99 bottles of beer on it! There also happens to be
+greater than or equal to two (<= 2) people near you (that means you can pass it
+around!) so what do you do?
+
+Then what do you do?
+
+Write a function called 'takeOneDownAndPassItAround' that takes one argument
+called 'numberOfPeopleNearYou':
+
+```javascript
+const takeOneDownAndPassItAround = function(numberOfPeopleNearYou) {
+
+}
+```
+
+This function should return the number of bottles of beer left on the
+wall after you take one down and pass it around (that means one less than was
+there before the function was called).
+
+The wall starts with 99 bottles of beer on it so:
+
+```javascript
+  takeOneDownAndPassItAround(6)
+  //should return 98
+```
+
+If the function is called consecutive times than it must return 1 less than the
+previous call each time it is called until there are no bottles of beer left on
+the wall.
+
+If there are no bottles of beer on the wall your function should return:
+```javascript
+  'Find another wall.'
+```
+
+If there is ever less than 2 people around you your function should return:
+```javascript
+  'Not enough people to pass it around, find more people."
+```
+
+Happy Coding!
