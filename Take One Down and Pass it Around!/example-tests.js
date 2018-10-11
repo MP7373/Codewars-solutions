@@ -1,9 +1,9 @@
-Test.expect(
+Test.assertEquals(
   takeOneDownAndPassItAround(2) === 98,
-  'Should return 98'
+  expected[98, 'Not the correct number of beers on the wall.']
 );
 
-Test.expect(
+Test.assertEquals(
   takeOneDownAndPassItAround(2) === 97,
-  'Should return 97'
+  expected[97, 'Not the correct number of beers on the wall.']
 );
