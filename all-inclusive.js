@@ -1,3 +1,4 @@
+//https://www.codewars.com/kata/all-inclusive/javascript
 const containAllRots = (strng, arr) => {
   console.log(strng);
   console.log(arr);
