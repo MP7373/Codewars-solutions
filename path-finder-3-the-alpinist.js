@@ -74,76 +74,80 @@ for (let y = 0; y < grid.length; y++) {
   }
 }
 
-while (heap.length() > 0) {
-  const cordinates = heap.get()
-  const [y, x] = cordinates
-  console.log(`${cordinates} value: ${grid[y][x]}`)
-}
+debugPrintHeap(heap)
+
+console.log(heap.get())
+
+debugPrintHeap(heap)
 
 function NextCordinateToTryHeap (grid) {
-  const backingArray = []
+  this.backingArray = []
 
-  // TODO: debug this
-  this.add = yAndX => {
-    backingArray.push(yAndX)
-    console.log(backingArray)
+  this.add = ([y, x]) => {
+    this.backingArray.push([y, x])
 
-    let index = backingArray.length - 1
-    let nextIndex = index % 2 === 0 ? index / 2 - 1 : (index + 1) / 2 - 1
-    let [y, x] = yAndX
+    let index = this.backingArray.length - 1
+    let parentIndex = getParentIndex(index)
+
     if (index > 0) {
-      // let [nextY, nextX] = backingArray[nextIndex]
-      let nextY = backingArray[nextIndex][0]
-      let nextX = backingArray[nextIndex][1]
-      while (grid[y][x] < grid[nextY][nextX]) {
-        const temp = backingArray[nextIndex]
-        backingArray[nextIndex] = backingArray[index]
-        backingArray[index] = temp
+      let [parentY, parentX] = this.backingArray[parentIndex]
 
-        index = nextIndex
-        nextIndex = index % 2 === 0 ? index / 2 - 1 : (index + 1) / 2 - 1
-        if (index === 0) {
+      while (grid[y][x] < grid[parentY][parentX]) {
+        const temp = this.backingArray[parentIndex]
+        this.backingArray[parentIndex] = this.backingArray[index]
+        this.backingArray[index] = temp
+
+        if (parentIndex === 0) {
           break
         }
-        [nextY, nextX] = backingArray[nextIndex]
+
+        index = parentIndex
+        parentIndex = getParentIndex(index)
+
+        parentY = this.backingArray[parentIndex][0]
+        parentX = this.backingArray[parentIndex][1]
       }
     }
-    console.log(backingArray)
   }
 
+  // TODO: debug this
   this.get = () => {
-    if (backingArray.length === 1) {
-      return backingArray.pop()
+    if (this.backingArray.length === 0) {
+      return null
     }
 
-    const value = backingArray[0]
+    if (this.backingArray.length === 1) {
+      return this.backingArray.pop()
+    }
 
-    backingArray[0] = backingArray.pop()
+    const value = this.backingArray[0]
+
+    this.backingArray[0] = this.backingArray.pop()
     let index = 0
 
-    let gridValue = grid[backingArray[index][0]][backingArray[index][1]]
-    let leftChildGridValue = grid[backingArray[index * 2 + 1][0]][backingArray[index * 2 + 1][1]]
-    let rightChildGridValue = grid[backingArray[index * 2 + 2][0]][backingArray[index * 2 + 2][1]]
+    let gridValue = grid[this.backingArray[index][0]][this.backingArray[index][1]]
+    let leftChildGridValue = grid[this.backingArray[index * 2 + 1][0]][this.backingArray[index * 2 + 1][1]]
+    let rightChildGridValue = grid[this.backingArray[index * 2 + 2][0]][this.backingArray[index * 2 + 2][1]]
 
     let largerThanLeftChild = gridValue >= leftChildGridValue
     let largerThanRightChild = gridValue >= rightChildGridValue
     while (
       index >= 0 &&
-      index < backingArray.length &&
-        !(largerThanLeftChild && largerThanRightChild)
+      index < this.backingArray.length &&
+        !(largerThanLeftChild || largerThanRightChild)
     ) {
       const leftGreaterThanRight = leftChildGridValue > rightChildGridValue
       const newIndex = index * 2 + (leftGreaterThanRight ? 1 : 2)
 
-      const temp = backingArray[index]
-      backingArray[index] = backingArray[newIndex]
-      backingArray[newIndex] = temp
+      const temp = this.backingArray[index]
+      this.backingArray[index] = this.backingArray[newIndex]
+      this.backingArray[newIndex] = temp
 
       index = newIndex
 
-      gridValue = grid[backingArray[index][0]][backingArray[index][1]]
-      leftChildGridValue = grid[backingArray[index * 2 + 1][0]][backingArray[index * 2 + 1][1]]
-      rightChildGridValue = grid[backingArray[index * 2 + 2][0]][backingArray[index * 2 + 2][1]]
+      gridValue = grid[this.backingArray[index][0]][this.backingArray[index][1]]
+      leftChildGridValue = grid[this.backingArray[index * 2 + 1][0]][this.backingArray[index * 2 + 1][1]]
+      rightChildGridValue = grid[this.backingArray[index * 2 + 2][0]][this.backingArray[index * 2 + 2][1]]
       largerThanLeftChild = gridValue >= leftChildGridValue
       largerThanRightChild = gridValue >= rightChildGridValue
     }
@@ -151,7 +155,17 @@ function NextCordinateToTryHeap (grid) {
     return value
   }
 
-  this.peak = () => backingArray[0]
+  this.peak = () => this.backingArray[0]
 
-  this.length = () => backingArray.length
+  this.length = () => this.backingArray.length
+}
+
+function getParentIndex (index) {
+  return index % 2 === 0 ? index / 2 - 1 : (index + 1) / 2 - 1
+}
+
+function debugPrintHeap (heap) {
+  heap.backingArray.forEach(([y, x], index) => {
+    console.log(`index: ${index}, parentIndex: ${getParentIndex(index)}, y: ${y} x: ${x}, value: ${grid[y][x]}`)
+  })
 }
