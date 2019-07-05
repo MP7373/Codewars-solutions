@@ -74,12 +74,15 @@ for (let y = 0; y < grid.length; y++) {
   }
 }
 
+while (heap.backingArray.length > 0) {
+  debugPrintHeap(heap)
+  const [y, x] = heap.get()
+  console.log(`\n GOT: ${y},${x}, value: ${grid[y][x]}\n`)
+}
+
 debugPrintHeap(heap)
 
-console.log(heap.get())
-
-debugPrintHeap(heap)
-
+// HEAP WORKS NOW! Just need to see if this solution is fast enough...
 function NextCordinateToTryHeap (grid) {
   this.backingArray = []
 
@@ -110,7 +113,6 @@ function NextCordinateToTryHeap (grid) {
     }
   }
 
-  // TODO: debug this
   this.get = () => {
     if (this.backingArray.length === 0) {
       return null
@@ -123,35 +125,62 @@ function NextCordinateToTryHeap (grid) {
     const value = this.backingArray[0]
 
     this.backingArray[0] = this.backingArray.pop()
+
     let index = 0
+    let leftChildIndex = getLeftChildIndex(index)
+    let rightChildIndex = getRightChildIndex(index)
 
-    let gridValue = grid[this.backingArray[index][0]][this.backingArray[index][1]]
-    let leftChildGridValue = grid[this.backingArray[index * 2 + 1][0]][this.backingArray[index * 2 + 1][1]]
-    let rightChildGridValue = grid[this.backingArray[index * 2 + 2][0]][this.backingArray[index * 2 + 2][1]]
+    const [y, x] = this.backingArray[index]
+    let gridValue = grid[y][x]
 
-    let largerThanLeftChild = gridValue >= leftChildGridValue
-    let largerThanRightChild = gridValue >= rightChildGridValue
-    while (
-      index >= 0 &&
-      index < this.backingArray.length &&
-        !(largerThanLeftChild || largerThanRightChild)
-    ) {
-      const leftGreaterThanRight = leftChildGridValue > rightChildGridValue
-      const newIndex = index * 2 + (leftGreaterThanRight ? 1 : 2)
+    if (leftChildIndex < this.backingArray.length) {
+      let [leftChildY, leftChildX] = this.backingArray[leftChildIndex]
+      let leftChildGridValue = grid[leftChildY][leftChildX]
+      let largerThanLeftChild = gridValue >= leftChildGridValue
 
-      const temp = this.backingArray[index]
-      this.backingArray[index] = this.backingArray[newIndex]
-      this.backingArray[newIndex] = temp
+      let rightChildY
+      let rightChildX
+      let rightChildGridValue
+      let largerThanRightChild
 
-      index = newIndex
+      if (rightChildIndex < this.backingArray.length) {
+        [rightChildY, rightChildX] = this.backingArray[rightChildIndex]
+        rightChildGridValue = grid[rightChildY][rightChildX]
+        largerThanRightChild = gridValue >= rightChildGridValue
+      }
 
-      gridValue = grid[this.backingArray[index][0]][this.backingArray[index][1]]
-      leftChildGridValue = grid[this.backingArray[index * 2 + 1][0]][this.backingArray[index * 2 + 1][1]]
-      rightChildGridValue = grid[this.backingArray[index * 2 + 2][0]][this.backingArray[index * 2 + 2][1]]
-      largerThanLeftChild = gridValue >= leftChildGridValue
-      largerThanRightChild = gridValue >= rightChildGridValue
+      while (
+        index >= 0 &&
+        ((leftChildIndex < this.backingArray.length && largerThanLeftChild) ||
+        (rightChildIndex < this.backingArray.length && largerThanRightChild))
+      ) {
+        const leftLessThanRight = rightChildIndex >= this.backingArray.length || leftChildGridValue <= rightChildGridValue
+        const newIndex = leftLessThanRight ? leftChildIndex : rightChildIndex
+
+        const temp = this.backingArray[index]
+        this.backingArray[index] = this.backingArray[newIndex]
+        this.backingArray[newIndex] = temp
+
+        index = newIndex
+        leftChildIndex = getLeftChildIndex(index)
+        rightChildIndex = getRightChildIndex(index)
+
+        const [y, x] = this.backingArray[index]
+        gridValue = grid[y][x]
+
+        if (leftChildIndex < this.backingArray.length) {
+          [leftChildY, leftChildX] = this.backingArray[leftChildIndex]
+          leftChildGridValue = grid[leftChildY][leftChildX]
+          largerThanLeftChild = gridValue >= leftChildGridValue
+
+          if (rightChildIndex < this.backingArray.length) {
+            [rightChildY, rightChildX] = this.backingArray[rightChildIndex]
+            rightChildGridValue = grid[rightChildY][rightChildX]
+            largerThanRightChild = gridValue >= rightChildGridValue
+          }
+        }
+      }
     }
-
     return value
   }
 
@@ -162,6 +191,14 @@ function NextCordinateToTryHeap (grid) {
 
 function getParentIndex (index) {
   return index % 2 === 0 ? index / 2 - 1 : (index + 1) / 2 - 1
+}
+
+function getLeftChildIndex (index) {
+  return index * 2 + 1
+}
+
+function getRightChildIndex (index) {
+  return index * 2 + 2
 }
 
 function debugPrintHeap (heap) {
