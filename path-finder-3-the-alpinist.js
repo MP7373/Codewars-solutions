@@ -1,88 +1,76 @@
-// IN PROGRESS
+// https://www.codewars.com/kata/path-finder-number-3-the-alpinist
+function pathFinder (area) {
+  if (area === '0') {
+    return 0
+  }
 
-// function pathFinder (area) {
-//   const grid = area.split('\n').map(s => [...s].map(s => +s))
-//   const leastStepsGrid = area.split('\n').map(s => [...s].map(s => 9999999))
+  const grid = area.split('\n').map(s => [...s].map(s => +s))
+  const leastStepsGrid = area.split('\n').map(s => [...s].map(s => 9999999))
 
-//   leastStepsGrid[0][0] = 0
+  leastStepsGrid[0][0] = 0
 
-//   const pathsToTryHeap = new NextCordinateToTryHeap(leastStepsGrid)
-//   pathsToTryHeap.add([1, 0])
-//   pathsToTryHeap.add([0, 1])
-//   const tryGoingDirection = tryGoingDirectionFunctionMaker(grid, leastStepsGrid, pathsToTryHeap)
+  const pathsToTryHeap = new NextCordinateToTryHeap(leastStepsGrid)
 
-//   while (pathsToTryHeap.length() > 0) {
-//     const [y, x] = pathsToTryHeap.get()
+  leastStepsGrid[1][0] = Math.abs(grid[0][0] - grid[1][0])
+  pathsToTryHeap.add([1, 0])
 
-//     const compassDirections = ['South', 'East', 'North', 'West']
-//     compassDirections.forEach(direction => tryGoingDirection(direction, y, x))
-//   }
+  leastStepsGrid[0][1] = Math.abs(grid[0][0] - grid[0][1])
+  pathsToTryHeap.add([0, 1])
 
-//   return leastStepsGrid[leastStepsGrid.length - 1][leastStepsGrid[0].length - 1]
-// }
+  const tryGoingDirection = tryGoingDirectionFunctionMaker(grid, leastStepsGrid, pathsToTryHeap)
 
-// function tryGoingDirectionFunctionMaker (grid, leastStepsGrid, pathsToTryHeap) {
-//   const gridNorthToSouthLength = grid.length
-//   const gridWestToEastLength = grid[0].length
+  while (pathsToTryHeap.length() > 0) {
+    const [y, x] = pathsToTryHeap.get()
 
-//   const makeStepIfItImprovesPath = (y, x, nextY, nextX) => {
-//     if (
-//       nextY >= 0 &&
-//           nextY < gridNorthToSouthLength &&
-//           nextX >= 0 &&
-//           nextX < gridWestToEastLength
-//     ) {
-//       const stepCost = Math.abs(grid[y][x] - grid[nextY][nextX])
-//       const stepsAfterStep = leastStepsGrid[y][x] + stepCost
+    if (y === leastStepsGrid.length - 1 && x === leastStepsGrid[0].length - 1) {
+      return leastStepsGrid[y][x]
+    }
 
-//       if (stepsAfterStep < leastStepsGrid[nextY][nextX]) {
-//         leastStepsGrid[nextY][nextX] = stepsAfterStep
-//         pathsToTryHeap.add([nextY, nextX])
-//       }
-//     }
-//   }
+    const compassDirections = ['South', 'East', 'North', 'West']
+    compassDirections.forEach(direction => tryGoingDirection(direction, y, x))
+  }
 
-//   return (compassDirection, y, x) => {
-//     switch (compassDirection) {
-//       case 'South':
-//         makeStepIfItImprovesPath(y, x, y + 1, x)
-//         break
-//       case 'East':
-//         makeStepIfItImprovesPath(y, x, y, x + 1)
-//         break
-//       case 'North':
-//         makeStepIfItImprovesPath(y, x, y - 1, x)
-//         break
-//       case 'West':
-//         makeStepIfItImprovesPath(y, x, y, x - 1)
-//     }
-//   }
-// }
+  return null
+}
 
-const area = `923
-458
-762`
-const grid = area.split('\n').map(s => [...s].map(s => +s))
-// const leastStepsGrid = area.split('\n').map(s => [...s].map(s => 9999999))
+function tryGoingDirectionFunctionMaker (grid, leastStepsGrid, pathsToTryHeap) {
+  const gridNorthToSouthLength = grid.length
+  const gridWestToEastLength = grid[0].length
 
-const heap = new NextCordinateToTryHeap(grid)
-console.log(heap)
+  const makeStepIfItImprovesPath = (y, x, nextY, nextX) => {
+    if (
+      nextY >= 0 &&
+      nextY < gridNorthToSouthLength &&
+      nextX >= 0 &&
+      nextX < gridWestToEastLength
+    ) {
+      const stepCost = Math.abs(grid[y][x] - grid[nextY][nextX])
+      const stepsAfterStep = leastStepsGrid[y][x] + stepCost
 
-for (let y = 0; y < grid.length; y++) {
-  for (let x = 0; x < grid[0].length; x++) {
-    heap.add([y, x])
+      if (stepsAfterStep < leastStepsGrid[nextY][nextX]) {
+        leastStepsGrid[nextY][nextX] = stepsAfterStep
+        pathsToTryHeap.add([nextY, nextX])
+      }
+    }
+  }
+
+  return (compassDirection, y, x) => {
+    switch (compassDirection) {
+      case 'South':
+        makeStepIfItImprovesPath(y, x, y + 1, x)
+        break
+      case 'East':
+        makeStepIfItImprovesPath(y, x, y, x + 1)
+        break
+      case 'North':
+        makeStepIfItImprovesPath(y, x, y - 1, x)
+        break
+      case 'West':
+        makeStepIfItImprovesPath(y, x, y, x - 1)
+    }
   }
 }
 
-while (heap.backingArray.length > 0) {
-  debugPrintHeap(heap)
-  const [y, x] = heap.get()
-  console.log(`\n GOT: ${y},${x}, value: ${grid[y][x]}\n`)
-}
-
-debugPrintHeap(heap)
-
-// HEAP WORKS NOW! Just need to see if this solution is fast enough...
 function NextCordinateToTryHeap (grid) {
   this.backingArray = []
 
@@ -199,10 +187,4 @@ function getLeftChildIndex (index) {
 
 function getRightChildIndex (index) {
   return index * 2 + 2
-}
-
-function debugPrintHeap (heap) {
-  heap.backingArray.forEach(([y, x], index) => {
-    console.log(`index: ${index}, parentIndex: ${getParentIndex(index)}, y: ${y} x: ${x}, value: ${grid[y][x]}`)
-  })
 }
