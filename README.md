@@ -1,7 +1,8 @@
 # Codewars
-I have been doing Codewars problems for a while but i've decided to start putting my solutions on GitHub just to have more code examples online. It may not always be the prettiest code but it at least shows I work to improve my craft.
+I have been doing Codewars problems for a while but i've decided to start putting my solutions on GitHub just to have more code examples online.
 
-I'm not going to go through all of my past solutions and add them to this repo but I intend to add the problems I do on Codewars here when I remember to.
+## Update
+I stopped doing this because the overhead of copying code to a file from and then committing it probably isn't worth the effort.
 
 ### Format
 Each solution file is named after the name of the Codewars problem that file solves (with respect to the language used's file naming conventions) and **the first line includes a comment of a link to the problem.**
